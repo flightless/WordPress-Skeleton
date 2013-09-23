@@ -1,10 +1,62 @@
 
+############################
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteBase /
+	RewriteRule ^(wp-admin/.*)$ /wp/$1 [L]
+	RewriteRule ^(wp-[^/]+\.php)$ /wp/$1 [L]
+	RewriteRule ^xmlrpc\.php$ /wp/xmlrpc.php [L]
+	RewriteRule ^(wp-includes/.*)$ /wp/$1 [L]
+</IfModule>
+
 # BEGIN WordPress
 <IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteBase /
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.php [L]
+	RewriteEngine On
+	RewriteBase /
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule . /index.php [L]
 </IfModule>
 # END WordPress
+
+############################
+
+# BEGIN Security
+
+# Block folder indexing
+Options All -Indexes
+
+# Hide SVN / GIT files
+RedirectMatch 404 /\\.(git|gitignore|gitmodules|sh|svn|log|htaccess|htpasswd|ini|phps|fla|psd)(/.*|$)
+
+# Hide private files
+<FilesMatch "(-config.php|timthumb.php)$">
+	Order Allow,Deny
+	Deny from all
+</FilesMatch>
+
+# BEGIN WordPress
+
+# END Security
+
+############################
+
+# BEGIN Optimization
+
+# Browser cache
+FileETag MTime Size
+<IfModule mod_expires.c>
+	<FilesMatch "\.(jpg|gif|png|css|js)$">
+		ExpiresActive on
+		ExpiresDefault "access plus 1 year"
+	</FilesMatch>
+</IfModule>
+
+# Compress data
+AddOutputFilterByType DEFLATE text/html text/plain text/xml application/xml application/xhtml+xml text/javascript text/css application/x-javascript
+BrowserMatch ^Mozilla/4 gzip-only-text/html
+BrowserMatch ^Mozilla/4.0[678] no-gzip
+BrowserMatch bMSIE !no-gzip !gzip-only-text/html
+
+# END Optimization
